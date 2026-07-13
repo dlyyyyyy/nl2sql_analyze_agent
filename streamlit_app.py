@@ -47,9 +47,9 @@ agent = create_sql_agent(llm=llm, toolkit=toolkit, verbose=False, handle_parsing
 
 # ====== 新增：推荐问题生成函数 ======
 def generate_recommended_questions(user_question: str, agent_answer: str) -> list:
-        print("🚀 函数被调用了！")  # ← 加这一行
-    st.write("🚀 函数被调用了！")  # ← 再加一行
-prompt = f"""
+    print("🚀 函数被调用了！")  # ← 缩进为4个空格
+    st.write("🚀 函数被调用了！")  # ← 缩进为4个空格
+    prompt = f"""
 你是一个数据分析助手。用户刚才问了下面这个问题，我给出了回答。
 
 用户问题：{user_question}
