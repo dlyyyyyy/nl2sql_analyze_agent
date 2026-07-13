@@ -27,6 +27,7 @@ llm = ChatDeepSeek(
 toolkit = SQLDatabaseToolkit(db=db, llm=llm)
 
 # 创建 Agent
+prefix = """你是一个 SQL 数据分析助手。如果已经得到最终结论，请务必在回答前加一句 "Final Answer: "，不要输出多余的解释或思考过程。"""
 agent = create_sql_agent(
     llm=llm,
     toolkit=toolkit,
@@ -39,7 +40,7 @@ def ask_question(question: str):
         response = agent.invoke({"input": question})
         return response['output']
     except Exception as e:
-        return f"Error: {str(e)}"
+        return f"程序解析遇到一点小问题，但 AI 可能已经算出了结果，报错详情如下，您可以刷新重试：\n{str(e)}"
 
 if __name__ == "__main__":
     test_questions = [
