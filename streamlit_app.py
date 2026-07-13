@@ -43,7 +43,7 @@ db = SQLDatabase.from_uri("sqlite:///sales.db")
 # 初始化模型
 llm = ChatDeepSeek(model="deepseek-v4-flash", api_key=api_key, temperature=0.1)
 toolkit = SQLDatabaseToolkit(db=db, llm=llm)
-agent = create_sql_agent(llm=llm, toolkit=toolkit, verbose=False, handle_parsing_errors=True，max_iterations=1)
+agent = create_sql_agent(llm=llm, toolkit=toolkit, verbose=False, handle_parsing_errors=True, max_iterations=1)
 
 # ====== 新增：推荐问题生成函数 ======
 def generate_recommended_questions(user_question: str, agent_answer: str) -> list:
