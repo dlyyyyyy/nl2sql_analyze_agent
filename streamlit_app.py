@@ -47,7 +47,9 @@ agent = create_sql_agent(llm=llm, toolkit=toolkit, verbose=False, handle_parsing
 
 # ====== 新增：推荐问题生成函数 ======
 def generate_recommended_questions(user_question: str, agent_answer: str) -> list:
-    prompt = f"""
+        print("🚀 函数被调用了！")  # ← 加这一行
+    st.write("🚀 函数被调用了！")  # ← 再加一行
+prompt = f"""
 你是一个数据分析助手。用户刚才问了下面这个问题，我给出了回答。
 
 用户问题：{user_question}
@@ -89,6 +91,12 @@ for msg in st.session_state.messages:
     with st.chat_message(msg["role"]):
         st.markdown(msg["content"])
 
+# ✅ 展示推荐问题（如果有）
+if "recommended" in st.session_state and st.session_state.recommended:
+    st.caption("💡 你可能还想问：")
+    for q in st.session_state.recommended:
+        st.markdown(f"- {q}")
+
 # 示例问题（快捷按钮）
 cols = st.columns(3)
 example_questions = [
@@ -129,13 +137,9 @@ if prompt := st.chat_input("输入你的数据问题..."):
         st.markdown(answer)
     st.session_state.messages.append({"role": "assistant", "content": answer})
 
-    # ====== 新增：生成并展示推荐问题 ======
-    with st.chat_message("assistant"):
-        with st.spinner("正在生成推荐问题..."):
-            recommended = generate_recommended_questions(prompt, answer)
-        if recommended:
-            st.caption("💡 你可能还想问：")
-            for q in recommended:
-                st.markdown(f"- {q}")
+    # ✅ 生成推荐问题，存入 session_state
+    with st.spinner("正在生成推荐问题..."):
+        recommended = generate_recommended_questions(prompt, answer)
+    st.session_state.recommended = recommended  # 暂存起来
 
     st.rerun()
