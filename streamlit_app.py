@@ -41,7 +41,7 @@ if not api_key:
 db = SQLDatabase.from_uri("sqlite:///sales.db")
 
 # 初始化模型
-llm = ChatDeepSeek(model="deepseek-chat", api_key=api_key, temperature=0.1)
+llm = ChatDeepSeek(model="deepseek-v3-turbo", api_key=api_key, temperature=0.1)
 toolkit = SQLDatabaseToolkit(db=db, llm=llm)
 agent = create_sql_agent(llm=llm, toolkit=toolkit, verbose=False, handle_parsing_errors=True)
 
