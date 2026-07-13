@@ -1,5 +1,6 @@
 import os
 import streamlit as st
+import json  # ← 新增
 from dotenv import load_dotenv
 from langchain_community.utilities import SQLDatabase
 from langchain_community.agent_toolkits import SQLDatabaseToolkit
@@ -43,6 +44,35 @@ db = SQLDatabase.from_uri("sqlite:///sales.db")
 llm = ChatDeepSeek(model="deepseek-chat", api_key=api_key, temperature=0.1)
 toolkit = SQLDatabaseToolkit(db=db, llm=llm)
 agent = create_sql_agent(llm=llm, toolkit=toolkit, verbose=False, handle_parsing_errors=True)
+
+# ====== 新增：推荐问题生成函数 ======
+def generate_recommended_questions(user_question: str, agent_answer: str) -> list:
+    prompt = f"""
+你是一个数据分析助手。用户刚才问了下面这个问题，我给出了回答。
+
+用户问题：{user_question}
+我的回答：{agent_answer}
+
+请根据以上对话，生成3个用户可能继续追问的相关问题。
+要求：
+- 只输出JSON数组，不要任何其他文字
+- 问题要贴近业务，覆盖不同角度（如时间对比、区域拓展、关联分析）
+- 格式示例：["问题1", "问题2", "问题3"]
+
+输出：
+"""
+    try:
+        response = llm.invoke(prompt)
+        raw = response.content.strip()
+        if raw.startswith("```json"):
+            raw = raw.split("```json")[1].split("```")[0].strip()
+        elif raw.startswith("```"):
+            raw = raw.split("```")[1].split("```")[0].strip()
+        questions = json.loads(raw)
+        return questions[:3]
+    except Exception as e:
+        print(f"生成推荐问题失败: {e}")
+        return []
 
 # 标题和说明
 st.title("💬 智能数据分析Agent")
@@ -98,4 +128,14 @@ if prompt := st.chat_input("输入你的数据问题..."):
                 answer = f"出错：{str(e)}"
         st.markdown(answer)
     st.session_state.messages.append({"role": "assistant", "content": answer})
+
+    # ====== 新增：生成并展示推荐问题 ======
+    with st.chat_message("assistant"):
+        with st.spinner("正在生成推荐问题..."):
+            recommended = generate_recommended_questions(prompt, answer)
+        if recommended:
+            st.caption("💡 你可能还想问：")
+            for q in recommended:
+                st.markdown(f"- {q}")
+
     st.rerun()
