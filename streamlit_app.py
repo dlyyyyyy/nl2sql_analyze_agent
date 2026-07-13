@@ -98,14 +98,22 @@ if "recommended" in st.session_state and st.session_state.recommended:
         st.markdown(f"- {q}")
 
 # 示例问题（快捷按钮）
-cols = st.columns(3)
+st.markdown("**快速提问：**")
 example_questions = [
     "哪个产品回款额最高？",
     "各区域回款总额排名",
-    "北京的平均回款率"
+    "北京的平均回款率",
+    "各产品的回款总额排名",
+    "上个月哪个产品回款额最高？",
+    "深圳的回款总额是多少？",
+    "回款额最低的区域是哪个？",
+    "A产品在全国的总回款额是多少？",
+    "各区域的平均回款率排名",
+    "哪个产品逾期天数最多？",
 ]
+cols = st.columns(4)
 for idx, q in enumerate(example_questions):
-    if cols[idx].button(q, key=f"ex_{idx}"):
+    if cols[idx % 4].button(q, key=f"ex_{idx}"):
         st.session_state.messages.append({"role": "user", "content": q})
         with st.chat_message("user"):
             st.markdown(q)
