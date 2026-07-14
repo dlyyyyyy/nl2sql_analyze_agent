@@ -43,7 +43,9 @@ db = SQLDatabase.from_uri("sqlite:///sales.db")
 # 初始化模型
 llm = ChatDeepSeek(model="deepseek-chat", api_key=api_key, temperature=0.1)
 toolkit = SQLDatabaseToolkit(db=db, llm=llm)
-agent = create_sql_agent(llm=llm, toolkit=toolkit, verbose=False, handle_parsing_errors=True)
+agent = create_sql_agent(llm=llm, toolkit=toolkit, verbose=False, handle_parsing_errors=True, agent_kwargs={
+        "system_message": "你是一个数据分析助手。请始终使用简体中文回答用户的问题，包括数字、单位和所有描述性语言。如果用户的问题需要查询数据库，请生成对应的 SQL 语句，并将结果用中文总结。"
+    })
 
 # ====== 新增：推荐问题生成函数 ======
 def generate_recommended_questions(user_question: str, agent_answer: str) -> list:
